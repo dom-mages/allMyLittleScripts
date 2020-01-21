@@ -5,11 +5,15 @@ import sys
 import os
 from datetime import datetime
 import time
+import subprocess
+import requests
 
 try:
-    print("hi");
     if(len(sys.argv) < 5): 
         raise Exception("At least three arguments <mode>, <name>, <date> and <time> are neeeded!")
+    apikey = os.environ['TRELLO_APIKEY']
+    token = os.environ['TRELLO_TOKEN']
+    memberid = os.environ['TRELLO_MEMBERID']
     mode = sys.argv[1]
     cardname = sys.argv[2]
     date = sys.argv[3]
@@ -24,15 +28,18 @@ try:
     else:
         raise Exception("%s is not a known mode!" % mode)
 
-    print(listid)
-    print(cardname)
-    print(date)
-    print(mytime)
-    print(attachmenturl)
-    mydatetime = "%s %s:00.000000" % (date, mytime)
-    duedate = datetime.strptime(mydatetime, '%Y%m%d %H:%M:%S.%f').isoformat()
-    print(duedate)
-    print(datetime.now().isoformat())
+    mydatetime = "%s %s" % (date, mytime)
+    isodate = subprocess.check_output(["date", "-Iseconds", "-d", mydatetime]).decode('utf-8').strip('\n')
+
+    urlsource_qureyparam = "&urlSource=%s" % attachmenturl if attachmenturl else "";
+    targeturl = "https://api.trello.com/1/cards?name=%s&due=%s&idList=%s&idMembers=%s&key=%s&token=%s%s" % (cardname, isodate, listid, memberid, apikey, token, urlsource_qureyparam)
+
+    payload = {}
+    headers={}
+
+    response = requests.request("POST", targeturl, headers=headers, data = payload)
+
+    print(response.text.encode('utf8'))
 
 except Exception as err:
     print("Error happened: \n%s" % err)
