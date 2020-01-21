@@ -21,9 +21,9 @@ try:
     attachmenturl = sys.argv[5] if len(sys.argv) == 6 else None
     if(mode == "maintenance"):
         listid = os.environ['TRELLO_MAINTENANCE_LISTID']
-    elif(mode == "deadline"):
-        listid = os.environ['TRELLO_APPOINTMENTS_LISTID']
     elif(mode == "appointment"):
+        listid = os.environ['TRELLO_APPOINTMENTS_LISTID']
+    elif(mode == "deadline"):
         listid = os.environ['TRELLO_DEADLINES_LISTID']
     else:
         raise Exception("%s is not a known mode!" % mode)
